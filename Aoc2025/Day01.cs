@@ -1,4 +1,5 @@
-﻿namespace AdventOfCode10.Aoc2025
+﻿
+namespace AdventOfCode10.Aoc2025
 {
     internal class Day01 : DayBase
     {
@@ -6,31 +7,54 @@
         {
             var input = GetInput("2025_01");
 
-            var numbers1 = new List<int>();
-            var numbers2 = new List<int>();
+            var dial = 50;
+            var zeroes = 0;
+            var zeroes2 = 0;
 
             foreach (var line in input)
             {
-                var numbers = line.Split("   ").Select(int.Parse).ToList();
-                numbers1.Add(numbers[0]);
-                numbers2.Add(numbers[1]);
+                zeroes2 += GetZeroes(dial, line);
+                switch (line[0])
+                {
+                    case 'L':
+                       dial -= int.Parse(line[1..]);
+                        break;
+                    case 'R':
+                        dial += int.Parse(line[1..]);
+                        break;
+                }
+                dial = (dial + 100) % 100;
+                Console.WriteLine($"The dial is rotated {line} to point at {dial}. Zeroes2 {zeroes2}");
+                if (dial == 0)
+                    zeroes++;
             }
 
-            numbers1.Sort();
-            numbers2.Sort();
 
-            var distance = 0;
-            var similarity = 0;
-            for (var i = 0; i < numbers1.Count; i++)
-            {
-                distance += Math.Abs(numbers1[i] - numbers2[i]);
-                similarity += numbers1[i] * numbers2.Count(n => n == numbers1[i]);
-            }
-
-            Console.WriteLine($"Distance: {distance}");
-            Console.WriteLine($"Similarity: {similarity}");
+            Console.WriteLine($"Code: {zeroes}");
+            Console.WriteLine($"Code2: {zeroes2}");
 
         }
 
+        private int GetZeroes(int dial, string line)
+        {
+            var stop = int.Parse(line[1..]);
+            var zeroes = 0;
+            for (int i = 1; i <= stop; i++)
+            {
+                switch (line[0])
+                {
+                    case 'L':
+                        dial--;
+                        break;
+                    case 'R':
+                        dial++;
+                        break;
+                }
+                dial = (dial + 100) % 100;
+                if (dial == 0)
+                    zeroes++;
+            }
+            return zeroes;
+        }
     }
 }
