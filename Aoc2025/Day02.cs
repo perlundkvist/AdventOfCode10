@@ -7,11 +7,6 @@ namespace AdventOfCode10.Aoc2025
     {
         internal void Run()
         {
-            var test = IsInvalid(1212);
-            test = IsInvalid(222222);
-            test = IsInvalid(12121212);
-            test = IsInvalid(123);
-
             var input = GetInput("2025_02");
             var sequences = input[0].Split(',').ToList();
             var invalid = 0L;
