@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "AdventOfCode10": {
+      "commandName": "Project"
+    },
+    "Else AoC": {
+      "commandName": "Project",
+      "commandLineArgs": "Web 2025"
+    }
+  }
+}
