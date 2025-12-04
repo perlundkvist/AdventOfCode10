@@ -1,8 +1,4 @@
-﻿
-
-
-
-namespace AdventOfCode10.Aoc2025
+﻿namespace AdventOfCode10.Aoc2025
 {
     internal class Day03 : DayBase
     {

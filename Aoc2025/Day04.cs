@@ -1,8 +1,4 @@
-﻿
-
-
-
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace AdventOfCode10.Aoc2025
 {
