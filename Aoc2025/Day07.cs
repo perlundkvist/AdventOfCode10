@@ -60,10 +60,10 @@ namespace AdventOfCode10.Aoc2025
             if (!splitters.Any(b => b.Line > start.Line))
                 return 1;
 
-            if (timelineSet.ContainsKey(start))
-                return timelineSet[start];
+            if (timelineSet.TryGetValue(start, out long value))
+                return value;
 
-            var timelineCount = 0L;
+            long timelineCount;
             var down = new Position(start.Line + 1, start.Col);
             if (!splitters.Contains(down))
             {
