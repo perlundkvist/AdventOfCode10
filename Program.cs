@@ -13,4 +13,4 @@ if (args.Any())
     return;
 }
 
-new AdventOfCode10.Aoc2025.Day07().Run();
+new AdventOfCode10.Aoc2025.Day08().Run();
