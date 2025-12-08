@@ -145,7 +145,7 @@ namespace AdventOfCode10
         {
             try
             {
-                var cookieValue = File.ReadAllText(@"C:\Projekt\AdventOfCode10\Input\Cookie.txt");
+                var cookieValue = File.ReadAllText(@"Input\Cookie.txt");
                 var cookieContainer = new CookieContainer();
                 var cookie = new Cookie("session", cookieValue) { Domain = ".adventofcode.com" };
                 cookieContainer.Add(cookie);
