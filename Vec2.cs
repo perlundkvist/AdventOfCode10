@@ -60,7 +60,7 @@ namespace AdventOfCode10
         }
     };
 
-    public struct Vec3
+    public struct Vec3 : IEquatable<Vec3>
     {
         public long X;
         public long Y;
@@ -121,6 +121,21 @@ namespace AdventOfCode10
         public override string ToString()
         {
             return $"({X},{Y},{Z})";
+        }
+
+        public bool Equals(Vec3 other)
+        {
+            return X == other.X && Y == other.Y && Z == other.Z;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is Vec3 other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(X, Y, Z);
         }
     };
 }
