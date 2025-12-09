@@ -49,6 +49,13 @@ namespace AdventOfCode10
             return (double)Math.Sqrt(X * X + Y * Y);
         }
 
+        internal double DistanceTo(Vec2 v2)
+        {
+            var x = X - v2.X;
+            var y = Y - v2.Y;
+            return (double)Math.Sqrt(x * x + y * y);
+        }
+
         public override string ToString()
         {
             return $"({X},{Y})";
@@ -58,8 +65,19 @@ namespace AdventOfCode10
         {
             return obj as Vec2? == this;
         }
-    };
 
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(X, Y);
+        }
+
+        internal object Area(Vec2 v2)
+        {
+            var x = Math.Abs(X - v2.X) + 1;
+            var y = Math.Abs(Y - v2.Y) + 1;
+            return x * y;
+        }
+    }
     public struct Vec3 : IEquatable<Vec3>
     {
         public long X;
