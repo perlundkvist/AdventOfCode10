@@ -8,7 +8,7 @@ namespace AdventOfCode10.Aoc2025
         internal void Run()
         {
             var sw = Stopwatch.StartNew();
-            var input = GetInput("2025_09");
+            var input = GetInput("2025_09s");
             var tiles = new List<Vec2>();
 
             foreach (var line in input)
@@ -33,6 +33,17 @@ namespace AdventOfCode10.Aoc2025
             Console.WriteLine($"Area: {tile1.Area(tile2)}. 4351395516 is wrong");
 
             sw.Restart();
+
+            while (true)
+            {
+                tile1 = neighbours.OrderByDescending(n => n.Key.Area(n.Value.First())).First().Key;
+                tile2 = neighbours[tile1].First();
+
+                var idx = tiles.IndexOf(tile1) - 1;
+                if (idx < 0)
+                    idx = tiles.Count - 1;
+                var before1 = tiles[idx];
+            }
 
 
             Console.WriteLine($"Result in {sw}");
