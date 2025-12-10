@@ -8,20 +8,22 @@ namespace AdventOfCode10.Aoc2025
         internal void Run()
         {
             var sw = Stopwatch.StartNew();
-            var input = GetInput("2025_10s");
+            var input = GetInput("2025_10");
 
             var total = 0L;
 
             foreach (var line in input)
             {
+                Console.WriteLine($"Now testing {input.IndexOf(line)} of {input.Count}");
                 var parts = line.Split(' '); 
-                var lights = new List<int>();
+                var wanted = new List<int>();
                 var buttons = new List<List<int>>();
+                //var tested = new HashSet<(List<int>, List<int>, long)>();
                 foreach (var part in parts)
                 {
                     if (part.StartsWith("["))
                     {
-                        lights.AddRange(part[1..^1].AllIndexesOf("#"));
+                        wanted.AddRange(part[1..^1].AllIndexesOf("#"));
                     }
                     else if (part.StartsWith("("))
                     {
@@ -30,11 +32,13 @@ namespace AdventOfCode10.Aoc2025
                     }
                 }
                 var least = long.MaxValue;
-                var wanted = lights.ToList();
                 foreach (var button in buttons)
                 {
-                    least = GetLeastPresses(wanted, lights, button, buttons, least, 0);
+                    var testing = $"({string.Join(",", button)})";
+                    least = GetLeastPresses(wanted, [], button, buttons, least, 0, new HashSet<(List<int>, List<int>, long)>());
                 }
+                Console.WriteLine($"Least: {least}.");
+                total += least;
             }
 
 
@@ -47,29 +51,39 @@ namespace AdventOfCode10.Aoc2025
 
         }
 
-        private long GetLeastPresses(List<int> wanted, List<int> lights, List<int> button, List<List<int>> buttons, long least, long presses)
+        private long GetLeastPresses(List<int> wanted, List<int> lights, List<int> button, List<List<int>> buttons,
+            long least, long presses, HashSet<(List<int>, List<int>, long)> tested)
         {
-            if (presses >= least)
+            if (presses >= least || presses > 10)
                 return least;
 
-            if (button.All(b => !wanted.Contains(b)))
-            {
-                return least;
-            }
+            //var test = tested.FirstOrDefault(t => t.Item1.SequenceEqual(button) && t.Item2.SequenceEqual(lights));
+            //if (test != default)
+            //    return presses + test.Item3;
+
+            //tested.Add((button.ToList(), lights.ToList(), least));
+            //test = tested.First(t => t.Item1.SequenceEqual(button) && t.Item2.SequenceEqual(lights));
+            //Console.WriteLine($"({string.Join(",", button)}) ({string.Join(",", lights)})");
 
             var newLights = new List<int>();
 
-            foreach (var press in button)
+            var stop = Math.Max(lights.Any() ? lights.Max() : 0, button.Max());
+            for (var i = 0; i <= stop; i++)
             {
+                var light = button.Contains(i) ^ lights.Contains(i);
+                if (light)
+                    newLights.Add(i);
             }
 
-            if (newLights.All(n => wanted.Contains(n)))
+            if (newLights.SequenceEqual(wanted))
             {
                 return presses + 1;
             }
+
             foreach (var button2 in buttons.Where(b => b != button).ToList())
             {
-                least = GetLeastPresses(wanted, newLights, button2, buttons, least, presses + 1);
+                var testing = $"({string.Join(",", button2)})";
+                least = GetLeastPresses(wanted, newLights.ToList(), button2, buttons, least, presses + 1, tested);
             }
             return least;
         }
