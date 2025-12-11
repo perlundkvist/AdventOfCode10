@@ -30,7 +30,7 @@ namespace AdventOfCode10.Aoc2025
             Console.WriteLine($"Result in {sw}");
             Console.WriteLine($"Tile1: {tile1}");
             Console.WriteLine($"Tile2: {tile2}");
-            Console.WriteLine($"Area: {tile1.Area(tile2)}. 4351395516 is wrong");
+            Console.WriteLine($"Area: {tile1.Area(tile2)}");
 
             sw.Restart();
 
@@ -43,6 +43,21 @@ namespace AdventOfCode10.Aoc2025
                 if (idx < 0)
                     idx = tiles.Count - 1;
                 var before1 = tiles[idx];
+                idx = (tiles.IndexOf(tile1) + 1) % tiles.Count;
+                var after1 = tiles[idx];
+
+                idx = tiles.IndexOf(tile2) - 1;
+                if (idx < 0)
+                    idx = tiles.Count - 1;
+                var before2 = tiles[idx];
+                idx = (tiles.IndexOf(tile2) + 1) % tiles.Count;
+                var after2 = tiles[idx];
+
+                var corner1 = new Vec2(Math.Min(tile1.X, tile2.X), Math.Min(tile1.Y, tile2.Y));
+                var corner2 = new Vec2(Math.Max(tile1.X, tile2.X), Math.Min(tile1.Y, tile2.Y));
+                var corner3 = new Vec2(Math.Max(tile1.X, tile2.X), Math.Max(tile1.Y, tile2.Y));
+                var corner4 = new Vec2(Math.Min(tile1.X, tile2.X), Math.Max(tile1.Y, tile2.Y));
+
             }
 
 
