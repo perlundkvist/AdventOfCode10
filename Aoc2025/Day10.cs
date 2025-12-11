@@ -14,11 +14,10 @@ namespace AdventOfCode10.Aoc2025
 
             foreach (var line in input)
             {
-                Console.WriteLine($"Now testing {input.IndexOf(line)} of {input.Count}");
                 var parts = line.Split(' '); 
                 var wanted = new List<int>();
                 var buttons = new List<List<int>>();
-                //var tested = new HashSet<(List<int>, List<int>, long)>();
+                var goals = new List<int>();
                 foreach (var part in parts)
                 {
                     if (part.StartsWith("["))
@@ -30,14 +29,20 @@ namespace AdventOfCode10.Aoc2025
                         var bParts = part[1..^1].Split(',');
                         buttons.Add(bParts.Select(b => int.Parse(b)).ToList());
                     }
+                    else if (part.StartsWith("{"))
+                    {
+                        var gParts = part[1..^1].Split(',');
+                        goals.AddRange(gParts.Select(g => int.Parse(g)).ToList());
+                    }
                 }
                 var least = long.MaxValue;
                 foreach (var button in buttons)
                 {
                     var testing = $"({string.Join(",", button)})";
-                    least = GetLeastPresses(wanted, [], button, buttons, least, 0, new HashSet<(List<int>, List<int>, long)>());
+                    //least = GetLeastPresses(wanted, [], button, buttons, least, 0, new HashSet<(List<int>, List<int>, long)>());
+                    least = GetLeastPresses2(goals.ToArray(), new int[goals.Count], button, buttons, least, 0);
                 }
-                Console.WriteLine($"Least: {least}.");
+                Console.WriteLine($"Least: {least}. Line {input.IndexOf(line) + 1} of {input.Count}");
                 total += least;
             }
 
@@ -85,6 +90,33 @@ namespace AdventOfCode10.Aoc2025
                 var testing = $"({string.Join(",", button2)})";
                 least = GetLeastPresses(wanted, newLights.ToList(), button2, buttons, least, presses + 1, tested);
             }
+            return least;
+        }
+
+
+        private long GetLeastPresses2(int[] goals, int[] current, List<int> button, List<List<int>> buttons, long least, int presses)
+        {
+            if (presses >= least)
+                return least;
+
+            var newCurrent = new int[current.Length];
+            for (var i = 0; i < current.Length; i++)
+            {
+                newCurrent[i] = current[i] + (button.Contains(i) ? 1 : 0);
+                if (newCurrent[i] > goals[i])
+                    return least;
+            }
+
+            if (newCurrent.SequenceEqual(goals))
+            {
+                return presses + 1;
+            }
+
+            foreach (var button2 in buttons)
+            {
+                least = GetLeastPresses2(goals, newCurrent, button2, buttons, least, presses + 1);
+            }
+
             return least;
         }
     }
