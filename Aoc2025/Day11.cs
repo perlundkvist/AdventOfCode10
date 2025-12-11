@@ -35,7 +35,7 @@ namespace AdventOfCode10.Aoc2025
             if (devices.ContainsKey("svr"))
             {
                 var start = devices["svr"];
-                var foundPaths = new Dictionary<string, List<string>());
+                var foundPaths = new Dictionary<string, List<string>>();
 
                 GetPaths2(start, devices, foundPaths);
                 total = foundPaths.Count;
@@ -79,12 +79,12 @@ namespace AdventOfCode10.Aoc2025
                     return foundPaths[device];
                 }
 
-                var paths = GetPaths2(devices[device], devices, foundDac, foundFft, foundPaths);
-                foundPaths[device] = (paths, foundDac, foundFft);
-                total += paths;
+                //var paths = GetPaths2(devices[device], devices, foundDac, foundFft, foundPaths);
+                //foundPaths[device] = (paths, foundDac, foundFft);
+                //total += paths;
             }
 
-            return total;
+            return [];
         }
     }
 }
