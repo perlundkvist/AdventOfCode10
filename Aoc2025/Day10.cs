@@ -96,33 +96,34 @@ namespace AdventOfCode10.Aoc2025
 
         private long GetLeastPresses2(int[] goals, int[] current, List<int> button, List<List<int>> buttons, long least, int presses, HashSet<(List<int>, int[], long)> results)
         {
-            if (presses >= least)
-                return least;
-
             var result = results.FirstOrDefault(r => r.Item1.SequenceEqual(button) && r.Item2.SequenceEqual(current));
             if (result != default)
-                return presses + result.Item3;
+                return result.Item3;
 
             var newCurrent = new int[current.Length];
             for (var i = 0; i < current.Length; i++)
             {
                 newCurrent[i] = current[i] + (button.Contains(i) ? 1 : 0);
                 if (newCurrent[i] > goals[i])
-                    return least;
+                    return long.MaxValue;
             }
 
             if (newCurrent.SequenceEqual(goals))
-            {
                 return presses + 1;
-            }
 
-            
+
+            if (presses >= least)
+                return long.MaxValue;
+
             foreach (var button2 in buttons)
             {
-                least = GetLeastPresses2(goals, newCurrent, button2, buttons, least, presses + 1, results);
-                results.Add((button2, newCurrent, least));
+                var pressed = GetLeastPresses2(goals, newCurrent, button2, buttons, least, presses + 1, results);
+                least = Math.Min(least, pressed);
             }
-
+            result = results.FirstOrDefault(r => r.Item1.SequenceEqual(button) && r.Item2.SequenceEqual(newCurrent));
+            if (result != default)
+                Console.WriteLine("Duplicate result detected!");
+            results.Add((button, newCurrent, least));
             return least;
         }
     }
