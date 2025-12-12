@@ -36,11 +36,12 @@ namespace AdventOfCode10.Aoc2025
                     }
                 }
                 var least = long.MaxValue;
+                var results = new HashSet<(List<int>, int[], long)>();
                 foreach (var button in buttons)
                 {
                     var testing = $"({string.Join(",", button)})";
                     //least = GetLeastPresses(wanted, [], button, buttons, least, 0, new HashSet<(List<int>, List<int>, long)>());
-                    least = GetLeastPresses2(goals.ToArray(), new int[goals.Count], button, buttons, least, 0, new HashSet<(List<int>, int[], long)>());
+                    least = GetLeastPresses2(goals.ToArray(), new int[goals.Count], button, buttons, least, 0, results);
                 }
                 Console.WriteLine($"Least: {least}. Line {input.IndexOf(line) + 1} of {input.Count}");
                 total += least;
@@ -111,19 +112,27 @@ namespace AdventOfCode10.Aoc2025
             if (newCurrent.SequenceEqual(goals))
                 return presses + 1;
 
-
             if (presses >= least)
                 return long.MaxValue;
 
             foreach (var button2 in buttons)
             {
                 var pressed = GetLeastPresses2(goals, newCurrent, button2, buttons, least, presses + 1, results);
+                if (current.All(c => c == 0))
+                    Console.WriteLine($"Button: {string.Join(",", button2)} | Pressed: {pressed}");
                 least = Math.Min(least, pressed);
             }
-            result = results.FirstOrDefault(r => r.Item1.SequenceEqual(button) && r.Item2.SequenceEqual(newCurrent));
+            result = results.FirstOrDefault(r => r.Item1.SequenceEqual(button) && r.Item2.SequenceEqual(current));
             if (result != default)
-                Console.WriteLine("Duplicate result detected!");
-            results.Add((button, newCurrent, least));
+            {
+                if(least < result.Item3)
+                {
+                    results.Remove(result);
+                    results.Add((button, current, least));
+                }
+            }
+            else
+                results.Add((button, current, least));
             return least;
         }
     }

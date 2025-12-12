@@ -8,42 +8,50 @@ namespace AdventOfCode10.Aoc2025
         internal void Run()
         {
             var sw = Stopwatch.StartNew();
-            var input = GetInput("2025_12s");
+            var input = GetInput("2025_12");
 
             var total = 0L;
 
-            var devices = new Dictionary<string, List<string>>();
+            var boxes = new List<int>();
+
+            var size = 0;
+            var doingBoxes = true;
 
             foreach (var line in input)
             {
-                var parts = line.Split(":");
-                devices[parts[0]] = parts[1].Trim().Split(" ").ToList();
+                if (doingBoxes && line.Contains("x"))
+                    doingBoxes = false;
+
+                if (doingBoxes)
+                {
+                    if (line.Contains(":"))
+                        continue;
+                    if (string.IsNullOrWhiteSpace(line))
+                    {
+                        boxes.Add(size);
+                        size = 0;
+                    }
+                    else
+                    {
+                        size += line.Count(c => c == '#');
+                    }
+                    continue;
+                }
+
+                var parts = line.Split(":", StringSplitOptions.TrimEntries);
+                var area = int.Parse(parts[0].Split("x")[0])* int.Parse(parts[0].Split("x")[1]);
+                var idx = 0;
+                foreach (var need in parts[1].Split(" ").Select(p => int.Parse(p)))
+                {
+                    var boxArea = boxes[idx] * need;
+                    area -= boxArea;
+                    idx++;
+                }
+                if (area >= 0)
+                    total++;
             }
 
-            if (devices.ContainsKey("you"))
-            {
-                var start = devices["you"];
-
-                total = GetPaths(start, devices);
-
-                Console.WriteLine($"Result in {sw}");
-                Console.WriteLine($"Total: {total}.");
-            }
-
-            sw.Restart();
-            total = 0L;
-            if (devices.ContainsKey("svr"))
-            {
-                var start = devices["svr"];
-                var foundPaths = new Dictionary<string, List<string>>();
-
-                GetPaths2(start, devices, foundPaths);
-                total = foundPaths.Count;
-
-                Console.WriteLine($"Result in {sw}");
-                Console.WriteLine($"Total: {total}.");
-            }
-
+            Console.WriteLine($"Total {total}");
             Console.WriteLine($"Result in {sw}");
 
         }
