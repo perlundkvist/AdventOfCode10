@@ -8,7 +8,7 @@ namespace AdventOfCode10.Aoc2025
         internal void Run()
         {
             var sw = Stopwatch.StartNew();
-            var input = GetInput("2025_10");
+            var input = GetInput("2025_10s");
 
             var total = 0L;
 
@@ -40,7 +40,7 @@ namespace AdventOfCode10.Aoc2025
                 {
                     var testing = $"({string.Join(",", button)})";
                     //least = GetLeastPresses(wanted, [], button, buttons, least, 0, new HashSet<(List<int>, List<int>, long)>());
-                    least = GetLeastPresses2(goals.ToArray(), new int[goals.Count], button, buttons, least, 0);
+                    least = GetLeastPresses2(goals.ToArray(), new int[goals.Count], button, buttons, least, 0, new HashSet<(List<int>, int[], long)>());
                 }
                 Console.WriteLine($"Least: {least}. Line {input.IndexOf(line) + 1} of {input.Count}");
                 total += least;
@@ -94,10 +94,14 @@ namespace AdventOfCode10.Aoc2025
         }
 
 
-        private long GetLeastPresses2(int[] goals, int[] current, List<int> button, List<List<int>> buttons, long least, int presses)
+        private long GetLeastPresses2(int[] goals, int[] current, List<int> button, List<List<int>> buttons, long least, int presses, HashSet<(List<int>, int[], long)> results)
         {
             if (presses >= least)
                 return least;
+
+            var result = results.FirstOrDefault(r => r.Item1.SequenceEqual(button) && r.Item2.SequenceEqual(current));
+            if (result != default)
+                return presses + result.Item3;
 
             var newCurrent = new int[current.Length];
             for (var i = 0; i < current.Length; i++)
@@ -112,9 +116,11 @@ namespace AdventOfCode10.Aoc2025
                 return presses + 1;
             }
 
+            
             foreach (var button2 in buttons)
             {
-                least = GetLeastPresses2(goals, newCurrent, button2, buttons, least, presses + 1);
+                least = GetLeastPresses2(goals, newCurrent, button2, buttons, least, presses + 1, results);
+                results.Add((button2, newCurrent, least));
             }
 
             return least;
