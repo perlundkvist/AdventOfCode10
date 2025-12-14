@@ -35,13 +35,12 @@ namespace AdventOfCode10.Aoc2025
             if (devices.ContainsKey("svr"))
             {
                 var start = devices["svr"];
-                var foundPaths = new Dictionary<string, List<string>>();
+                var visited = new Dictionary<string, long>();
 
-                GetPaths2(start, devices, foundPaths);
-                total = foundPaths.Count;
+                var paths = GetPaths2(start, devices, visited);
 
                 Console.WriteLine($"Result in {sw}");
-                Console.WriteLine($"Total: {total}.");
+                Console.WriteLine($"Total: {paths.Count}.");
             }
 
             Console.WriteLine($"Result in {sw}");
@@ -66,23 +65,23 @@ namespace AdventOfCode10.Aoc2025
             return paths;
         }
 
-        private List<string> GetPaths2(List<string> start, Dictionary<string, List<string>> devices, Dictionary<string, List<string>> foundPaths)
+        private List<string> GetPaths2(List<string> start, Dictionary<string, List<string>> devices, Dictionary<string, long> visited)
         {
-            var total = 0L;
-            foreach (var device in start)
+            if (start.Contains("out"))
             {
-                if (device == "out")
-                    return ["out"];
-
-                if (foundPaths.ContainsKey(device))
-                {
-                    return foundPaths[device];
-                }
-
-                //var paths = GetPaths2(devices[device], devices, foundDac, foundFft, foundPaths);
-                //foundPaths[device] = (paths, foundDac, foundFft);
-                //total += paths;
+                return start;
             }
+            //foreach (var device in start)
+            //{
+            //    if (visited.ContainsKey(device))
+            //    {
+            //        total += visited[device];
+            //        continue;
+            //    }
+            //    var correct = GetPaths2(devices[device], devices, visited);
+            //    visited[device] = correct;
+            //    total += correct;
+            //}
 
             return [];
         }

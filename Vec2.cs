@@ -71,7 +71,7 @@ namespace AdventOfCode10
             return HashCode.Combine(X, Y);
         }
 
-        internal object Area(Vec2 v2)
+        internal long Area(Vec2 v2)
         {
             var x = Math.Abs(X - v2.X) + 1;
             var y = Math.Abs(Y - v2.Y) + 1;

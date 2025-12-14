@@ -14,7 +14,7 @@ namespace AdventOfCode10.Aoc2025
 
             foreach (var line in input)
             {
-                var parts = line.Split(' '); 
+                var parts = line.Split(' ');
                 var wanted = new List<int>();
                 var buttons = new List<List<int>>();
                 var goals = new List<int>();
@@ -41,7 +41,8 @@ namespace AdventOfCode10.Aoc2025
                 {
                     var testing = $"({string.Join(",", button)})";
                     //least = GetLeastPresses(wanted, [], button, buttons, least, 0, new HashSet<(List<int>, List<int>, long)>());
-                    least = GetLeastPresses2(goals.ToArray(), new int[goals.Count], button, buttons, least, 0, results);
+                    //least = GetLeastPresses2(goals.ToArray(), new int[goals.Count], button, buttons, least, 0, results);
+                    least = GetLeastPresses3(goals.ToArray(), new int[goals.Count], button, buttons, least, 0);
                 }
                 Console.WriteLine($"Least: {least}. Line {input.IndexOf(line) + 1} of {input.Count}");
                 total += least;
@@ -110,7 +111,7 @@ namespace AdventOfCode10.Aoc2025
             }
 
             if (newCurrent.SequenceEqual(goals))
-                return presses + 1;
+                return presses;
 
             if (presses >= least)
                 return long.MaxValue;
@@ -125,7 +126,7 @@ namespace AdventOfCode10.Aoc2025
             result = results.FirstOrDefault(r => r.Item1.SequenceEqual(button) && r.Item2.SequenceEqual(current));
             if (result != default)
             {
-                if(least < result.Item3)
+                if (least < result.Item3)
                 {
                     results.Remove(result);
                     results.Add((button, current, least));
@@ -134,6 +135,12 @@ namespace AdventOfCode10.Aoc2025
             else
                 results.Add((button, current, least));
             return least;
+        }
+
+        private long GetLeastPresses3(int[] goals, int[] current, List<int> button, List<List<int>> buttons, long least, int presses)
+        {
+
+            return 0;
         }
     }
 }
