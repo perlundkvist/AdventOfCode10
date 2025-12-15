@@ -43,7 +43,7 @@ namespace AdventOfCode10.Aoc2025
                 tile2 = neighbours[tile1].First();
 
                 var debug = false;
-                if (tile1.ToString() == "(85225,82359)" && tile2.ToString() == "(14468,17359)")
+                if (tile1.ToString() == "(15007,82025)" && tile2.ToString() == "(84454,17061)")
                     debug = true;
 
                 var cornerUpLeft = new Vec2(Math.Min(tile1.X, tile2.X), Math.Min(tile1.Y, tile2.Y));
@@ -77,8 +77,8 @@ namespace AdventOfCode10.Aoc2025
             insideTiles.AddRange(tiles.Where(t => t.X == cornerUpLeft.X && t.Y > cornerDownLeft.Y && t.Y < cornerUpLeft.Y));
             insideTiles.AddRange(tiles.Where(t => t.X == cornerUpRight.X && t.Y > cornerDownLeft.Y && t.Y < cornerUpLeft.Y));
 
-            //if (insideTiles.Count == 0) 
-            //    return false;
+            if (insideTiles.Count > 0)
+                return true;
 
             if (debug)
             {
@@ -96,14 +96,14 @@ namespace AdventOfCode10.Aoc2025
                     var upY = Math.Max(tile.Y, next.Y);
                     if (tile.X >= cornerUpLeft.X && tile.X <= cornerUpRight.X)
                     {
-                        if (debug)
-                        {
-                            Console.WriteLine($"Checking vertical line: {tile} - {next}");
-                        }
                         if (downY == cornerDownLeft.Y && upY < cornerUpLeft.Y)
                             return true;
                         if (downY > cornerDownLeft.Y && upY <= cornerUpLeft.Y)
                             return true;
+                        if (debug)
+                        {
+                            Console.WriteLine($"Checking vertical line: {cornerDownLeft.Y} < {cornerUpLeft.Y} : {downY} < {upY}");
+                        }
                     }
                 }
                 else // Horizontal line
@@ -112,14 +112,14 @@ namespace AdventOfCode10.Aoc2025
                     var rightX = Math.Max(tile.X, next.X);
                     if (tile.Y >= cornerDownLeft.Y && tile.Y <= cornerUpLeft.Y)
                     {
-                        if (debug)
-                        {
-                            Console.WriteLine($"Checking horizontal line: {tile} - {next}");
-                        }
                         if (leftX == cornerUpLeft.X && rightX < cornerUpRight.X)
                             return true;
                         if (leftX > cornerUpLeft.X && rightX <= cornerUpRight.X)
                             return true;
+                        if (debug)
+                        {
+                            Console.WriteLine($"Checking horizontal line: {cornerUpLeft.X} < {cornerUpRight.X} : {leftX} < {rightX}");
+                        }
                     }
                 }
             }
