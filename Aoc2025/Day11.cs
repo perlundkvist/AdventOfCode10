@@ -8,7 +8,7 @@ namespace AdventOfCode10.Aoc2025
         internal void Run()
         {
             var sw = Stopwatch.StartNew();
-            var input = GetInput("2025_11ss");
+            var input = GetInput("2025_11");
 
             var total = 0L;
 
@@ -23,67 +23,74 @@ namespace AdventOfCode10.Aoc2025
             if (devices.ContainsKey("you"))
             {
                 var start = devices["you"];
-
-                total = GetPaths(start, devices);
+                var visited = new Dictionary<string, long>();
+                total = GetPaths(start, devices, "out", visited);
 
                 Console.WriteLine($"Result in {sw}");
                 Console.WriteLine($"Total: {total}.");
             }
 
+            Console.WriteLine();
+
             sw.Restart();
             total = 0L;
             if (devices.ContainsKey("svr"))
             {
-                var start = devices["svr"];
                 var visited = new Dictionary<string, long>();
+                var start = devices["svr"];
+                var end = "fft";
+                var paths1 = GetPaths(start, devices, end, visited);
+                Console.WriteLine($"To {end}: {paths1}.");
 
-                var paths = GetPaths2(start, devices, visited);
+                start = devices[end];
+                end = "dac";
+                visited.Clear();
+                var paths2 = GetPaths(start, devices, end, visited);
+                Console.WriteLine($"To {end}: {paths2}.");
 
-                Console.WriteLine($"Result in {sw}");
-                Console.WriteLine($"Total: {paths.Count}.");
+                start = devices["dac"];
+                end = "out";
+                visited.Clear();
+                var paths3 = GetPaths(start, devices, end, visited);
+                Console.WriteLine($"To {end}: {paths3}.");
+
+                Console.WriteLine($"Total: {paths1 * paths2 * paths3}.");
             }
 
             Console.WriteLine($"Result in {sw}");
 
         }
 
-        private long GetPaths(List<string> start, Dictionary<string, List<string>> devices)
+        private long GetPaths(List<string> start, Dictionary<string, List<string>> devices, string target, Dictionary<string, long> visited)
         {
-            var paths = 0L;
+            var total = 0L;
             foreach (var device in start)
             {
-                if (device == "out")
+                var paths = 0L;
+                if (device == target)
                 {
                     paths++;
                 }
+                else if (device == "out")
+                {
+                    return 0;
+                }
                 else
                 {
-                    paths += GetPaths(devices[device], devices);
+                    if (visited.ContainsKey(device))
+                    {
+                        paths = visited[device];
+                    }
+                    else
+                    {
+                        paths = GetPaths(devices[device], devices, target, visited);
+                        visited[device] = paths;
+                    }
                 }
+                total += paths;
             }
 
-            return paths;
-        }
-
-        private List<string> GetPaths2(List<string> start, Dictionary<string, List<string>> devices, Dictionary<string, long> visited)
-        {
-            if (start.Contains("out"))
-            {
-                return start;
-            }
-            //foreach (var device in start)
-            //{
-            //    if (visited.ContainsKey(device))
-            //    {
-            //        total += visited[device];
-            //        continue;
-            //    }
-            //    var correct = GetPaths2(devices[device], devices, visited);
-            //    visited[device] = correct;
-            //    total += correct;
-            //}
-
-            return [];
+            return total;
         }
     }
 }
