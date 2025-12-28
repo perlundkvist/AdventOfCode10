@@ -1,5 +1,5 @@
-﻿using System.Diagnostics;
-using static AdventOfCode10.DayBase;
+﻿using Google.OrTools.LinearSolver;
+using System.Diagnostics;
 
 namespace AdventOfCode10.Aoc2025
 {
@@ -8,9 +8,11 @@ namespace AdventOfCode10.Aoc2025
         internal void Run()
         {
             var sw = Stopwatch.StartNew();
-            var input = GetInput("2025_10s");
+            var input = GetInput("2025_10");
 
             var total = 0L;
+
+            var doPart1 = false;
 
             foreach (var line in input)
             {
@@ -36,41 +38,32 @@ namespace AdventOfCode10.Aoc2025
                     }
                 }
                 var least = long.MaxValue;
-                var results = new HashSet<(List<int>, int[], long)>();
-                foreach (var button in buttons)
+                if (doPart1)
                 {
-                    var testing = $"({string.Join(",", button)})";
-                    //least = GetLeastPresses(wanted, [], button, buttons, least, 0, new HashSet<(List<int>, List<int>, long)>());
-                    //least = GetLeastPresses2(goals.ToArray(), new int[goals.Count], button, buttons, least, 0, results);
-                    least = GetLeastPresses3(goals.ToArray(), new int[goals.Count], button, buttons, least, 0);
+                    foreach (var button in buttons)
+                    {
+                        var testing = $"({string.Join(",", button)})";
+                        least = GetLeastPresses(wanted, [], button, buttons, least, 0);
+                    }
+                    Console.WriteLine($"Least: {least}. Line {input.IndexOf(line) + 1} of {input.Count}");
                 }
-                Console.WriteLine($"Least: {least}. Line {input.IndexOf(line) + 1} of {input.Count}");
+                else
+                {
+                    least = DoSolver(buttons, goals);
+                }
                 total += least;
             }
 
 
             Console.WriteLine($"Result in {sw}");
             Console.WriteLine($"Total: {total}.");
-
-            sw.Restart();
-
-            Console.WriteLine($"Result in {sw}");
-
         }
 
         private long GetLeastPresses(List<int> wanted, List<int> lights, List<int> button, List<List<int>> buttons,
-            long least, long presses, HashSet<(List<int>, List<int>, long)> tested)
+            long least, long presses)
         {
             if (presses >= least || presses > 10)
                 return least;
-
-            //var test = tested.FirstOrDefault(t => t.Item1.SequenceEqual(button) && t.Item2.SequenceEqual(lights));
-            //if (test != default)
-            //    return presses + test.Item3;
-
-            //tested.Add((button.ToList(), lights.ToList(), least));
-            //test = tested.First(t => t.Item1.SequenceEqual(button) && t.Item2.SequenceEqual(lights));
-            //Console.WriteLine($"({string.Join(",", button)}) ({string.Join(",", lights)})");
 
             var newLights = new List<int>();
 
@@ -90,57 +83,56 @@ namespace AdventOfCode10.Aoc2025
             foreach (var button2 in buttons.Where(b => b != button).ToList())
             {
                 var testing = $"({string.Join(",", button2)})";
-                least = GetLeastPresses(wanted, newLights.ToList(), button2, buttons, least, presses + 1, tested);
+                least = GetLeastPresses(wanted, newLights.ToList(), button2, buttons, least, presses + 1);
             }
             return least;
         }
 
-
-        private long GetLeastPresses2(int[] goals, int[] current, List<int> button, List<List<int>> buttons, long least, int presses, HashSet<(List<int>, int[], long)> results)
+        // https://developers.google.com/optimization/mip/mip_example
+        private long DoSolver(List<List<int>> buttons, List<int> goals)
         {
-            var result = results.FirstOrDefault(r => r.Item1.SequenceEqual(button) && r.Item2.SequenceEqual(current));
-            if (result != default)
-                return result.Item3;
-
-            var newCurrent = new int[current.Length];
-            for (var i = 0; i < current.Length; i++)
+            var solver = Solver.CreateSolver("SCIP");
+            var variables = new List<Variable>();
+            var sumExpr = new LinearExpr();
+            for (var i = 0; i < buttons.Count; i++)
             {
-                newCurrent[i] = current[i] + (button.Contains(i) ? 1 : 0);
-                if (newCurrent[i] > goals[i])
-                    return long.MaxValue;
+                var v = solver.MakeIntVar(0.0, double.PositiveInfinity, $"b{i}");
+                variables.Add(v);
+                sumExpr += v;
             }
 
-            if (newCurrent.SequenceEqual(goals))
-                return presses;
-
-            if (presses >= least)
-                return long.MaxValue;
-
-            foreach (var button2 in buttons)
+            // Constraints
+            for (var g = 0; g < goals.Count; g++)
             {
-                var pressed = GetLeastPresses2(goals, newCurrent, button2, buttons, least, presses + 1, results);
-                if (current.All(c => c == 0))
-                    Console.WriteLine($"Button: {string.Join(",", button2)} | Pressed: {pressed}");
-                least = Math.Min(least, pressed);
-            }
-            result = results.FirstOrDefault(r => r.Item1.SequenceEqual(button) && r.Item2.SequenceEqual(current));
-            if (result != default)
-            {
-                if (least < result.Item3)
+                var expr = new LinearExpr();
+                for (var b = 0; b < buttons.Count; b++)
                 {
-                    results.Remove(result);
-                    results.Add((button, current, least));
+                    var button = buttons[b];
+                    if (button.Contains(g))
+                    {
+                        expr += variables[b];
+                    }
                 }
+                var goal = goals[g];
+                solver.Add(expr == goal);
             }
-            else
-                results.Add((button, current, least));
-            return least;
+
+            solver.Minimize(sumExpr);
+
+            var status = solver.Solve();
+
+            if (status != Solver.ResultStatus.OPTIMAL)
+            {
+                Console.WriteLine("The problem does not have an optimal solution!");
+                return 0;
+            }
+
+            var sum = variables.Sum(v => (long) v.SolutionValue());
+            //Console.WriteLine($"Sum: {sum}");
+
+            return sum;
+
         }
 
-        private long GetLeastPresses3(int[] goals, int[] current, List<int> button, List<List<int>> buttons, long least, int presses)
-        {
-
-            return 0;
-        }
     }
 }
