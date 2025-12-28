@@ -155,5 +155,22 @@ namespace AdventOfCode10
         {
             return HashCode.Combine(X, Y, Z);
         }
-    };
+    }
+
+    public struct LineSegment
+    {
+        public Vec2 Start;
+        public Vec2 End;
+
+        public LineSegment(Vec2 start, Vec2 end)
+        {
+            Start = start.X < end.X ? start : start.X > end.X ? end : start.Y < end.Y ? start : end;
+            End = Start == start ? end : start;
+        }
+
+        override public string ToString()
+        {
+            return $"[{Start} -> {End}]";
+        }
+    }
 }
